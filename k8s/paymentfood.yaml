@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paymentdpl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paymentdpl
+  template:
+    metadata:
+      labels:
+        app: paymentdpl
+    spec:
+      containers:
+        - name: paymentdpl
+          image: sachetwasti61/paymentfood
+          ports:
+            - containerPort: 8052
+          env:
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: stripe_secure_key
+                  name: stripe-secure-key-cm
+            - name: STRIPE_PUBLIC_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: stripe_public_key
+                  name: stripe-secure-key-cm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paymentsrv
+spec:
+  selector:
+    app: paymentdpl
+  ports:
+    - port: 8052
+      targetPort: 8052

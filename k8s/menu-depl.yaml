@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: menudpl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: menudpl
+  template:
+    metadata:
+      labels:
+        app: menudpl
+    spec:
+      containers:
+        - name: menudpl
+          image: sachetwasti61/menu
+          ports:
+            - containerPort: 8081
+          env:
+            - name: MENU_MONGO_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: menu_mongo_url
+                  name: menu-cm
+            - name: BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: bucket_name
+                  name: menu-cm
+            - name: SECURE_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: secure_key
+                  name: secure-key-cm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: menusrv
+spec:
+  selector:
+    app: menudpl
+  ports:
+    - port: 8081
+      targetPort: 8081

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: auth-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - "ReadWriteOnce"
+  hostPath:
+    path: /Users/swasti/Documents/Docker/data/db_user
+  claimRef:
+    name: auth-pvc
+    namespace: default
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  volumeName: "auth-pv"

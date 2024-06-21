@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amazon-api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: amazon-api-gateway
+  template:
+    metadata:
+      labels:
+        app: amazon-api-gateway
+    spec:
+      containers:
+      - name: amazon-api-gateway
+        image: sachetwasti61/amazon-api-gateway
+        ports:
+        - containerPort: 8081
+        env:
+        - name: INVENTORY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: inventory_service
+              name: inventory-service-url
+        - name: AUTH_URL
+          valueFrom:
+            configMapKeyRef:
+              key: auth_service
+              name: auth-service-url
+        - name: ORDER_URL
+          valueFrom:
+            configMapKeyRef:
+              key: order_service
+              name: order-service-url
+        - name: PAYMENT_URL
+          valueFrom:
+            configMapKeyRef:
+              key: payment_service
+              name: payment-service-url
+        - name: SECURE_KEY
+          valueFrom:
+            configMapKeyRef:
+              key: secure_key
+              name: secure-key-cm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: amazon-gateway-srv
+spec:
+  type: LoadBalancer
+  selector:
+    app: amazon-api-gateway
+  ports:
+  - name: amazon-api-gateway
+    protocol: TCP
+    port: 8081
+    targetPort: 8081

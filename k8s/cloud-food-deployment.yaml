@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-gateway-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloud-gateway-deployment
+  template:
+    metadata:
+      labels:
+        app: cloud-gateway-deployment
+    spec:
+      containers:
+      - name: cloud-gateway-deployment
+        image: sachetwasti61/cloud-gateway-food-deployment
+        ports:
+        - containerPort: 9090
+        env:
+        - name: AUTH_MONGO_URL
+          valueFrom:
+            configMapKeyRef:
+              key: auth_mongo_url
+              name: auth-mongo-cm
+        - name: MENU_URL
+          valueFrom:
+            configMapKeyRef:
+              key: menu_url
+              name: menu-cm
+        - name: AUTH_URL
+          valueFrom:
+            configMapKeyRef:
+              key: auth_service
+              name: auth-service-url
+        - name: SECURE_KEY
+          valueFrom:
+            configMapKeyRef:
+              key: secure_key
+              name: secure-key-cm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloud-gateway-srv
+spec:
+  type: LoadBalancer
+  selector:
+    app: cloud-gateway-deployment
+  ports:
+  - name: cloud-gateway-deployment
+    protocol: TCP
+    port: 9090
+    targetPort: 9090
+

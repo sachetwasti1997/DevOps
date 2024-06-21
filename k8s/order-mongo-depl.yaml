@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-food-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-food-mongo
+  template:
+    metadata:
+      labels:
+        app: order-food-mongo
+    spec:
+      containers:
+        - name: order-mongo
+          image: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-food-mongo-srv
+spec:
+  selector:
+    app: order-food-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

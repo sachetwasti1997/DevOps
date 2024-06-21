@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expirationdpl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expirationdpl
+  template:
+    metadata:
+      labels:
+        app: expirationdpl
+    spec:
+      containers:
+        - name: expirationdpl
+          image: sachetwasti61/expfood
+          ports:
+            - containerPort: 8090

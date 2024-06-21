@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: authmysql
+spec:
+  selector:
+    matchLabels:
+      app: authmysql
+  serviceName: "mysqlsrv"
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: authmysql
+    spec:
+      containers:
+      - name: authmysql
+        image: mysql
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "Wasti786@"
+        volumeMounts:
+        - name: mysql-initdb
+          mountPath: /docker-entrypoint-initdb.d
+        - name: auth-volume
+          mountPath: /data/db
+      volumes:
+      - name: mysql-initdb
+        configMap:
+          name: mysql-initdb-config
+      - name: auth-volume
+        persistentVolumeClaim:
+          claimName: auth-pvc
+---
+#Headless Service for write
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysqlsrv
+spec:
+  selector:
+    app: authmysql
+  clusterIP: None
+  ports:
+  - port: 3306
+    targetPort: 3306
+---
+#ClusterIP service for read access
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysqlsrv-read
+spec:
+  selector:
+    app: authmysql
+  ports:
+  - port: 3306
+    targetPort: 3306

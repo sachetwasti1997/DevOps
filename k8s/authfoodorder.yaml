@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authfoodorderdpl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authfoodorderdpl
+  template:
+    metadata:
+      labels:
+        app: authfoodorderdpl
+    spec:
+      containers:
+      - name: authfoodorderdpl
+        image: sachetwasti61/auth_service_food_ordering
+        ports:
+        - containerPort: 8080
+        env:
+        - name: AUTH_MONGO_URL
+          valueFrom:
+            configMapKeyRef:
+              key: auth_mongo_url
+              name: auth-mongo-cm
+        - name: SECURE_KEY
+          valueFrom:
+            configMapKeyRef:
+              key: secure_key
+              name: secure-key-cm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authfoodsrv
+spec:
+  selector:
+    app: authfoodorderdpl
+  ports:
+  - port: 8080
+    targetPort: 8080
+
+

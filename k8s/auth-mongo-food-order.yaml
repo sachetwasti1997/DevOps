@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-food-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-food-mongo
+  template:
+    metadata:
+      labels:
+        app: auth-food-mongo
+    spec:
+      containers:
+        - name: auth-mongo
+          image: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-food-mongo-srv
+spec:
+  selector:
+    app: auth-food-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
